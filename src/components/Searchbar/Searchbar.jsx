@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { toast } from 'react-toastify';
+import { FaSistrix } from 'react-icons/fa';
 
 import {
   SearchbarSection,
@@ -48,6 +49,7 @@ export default class Searchbar extends Component {
       <SearchbarSection>
         <SearchForm onSubmit={this.handleFormSubmit}>
           <SearchFormButton type="submit">
+            <FaSistrix style={{ width: 25, height: 25 }} />
             <SearchFormButtonLabel>Search</SearchFormButtonLabel>
           </SearchFormButton>
 
