@@ -48,10 +48,6 @@ export default class App extends Component {
     servicePixabayAPI.page = nextPage;
 
     servicePixabayAPI.getImages().then(data => {
-      console.log(
-        'servicePixabayAPI.setTotalHits(data.totalHits);',
-        data.totalHits
-      );
       servicePixabayAPI.hits = data.totalHits;
 
       const newData = data.hits.map(
@@ -85,8 +81,6 @@ export default class App extends Component {
       }
 
       if (nextPage === 1) {
-        console.log('servicePixabayAPI.getTotalHits()', servicePixabayAPI.hits);
-
         toast.success(`Hooray! We found ${servicePixabayAPI.hits} images.`);
       }
 
@@ -99,7 +93,6 @@ export default class App extends Component {
   };
 
   handlerSearchQuery = searchQuery => {
-    console.log('handlerSearchQuery', searchQuery);
     this.setState({
       searchQuery: searchQuery,
     });
