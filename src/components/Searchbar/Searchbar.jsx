@@ -1,3 +1,6 @@
+import { Component } from 'react';
+import { toast } from 'react-toastify';
+
 import {
   SearchbarSection,
   SearchForm,
@@ -6,21 +9,59 @@ import {
   SearchFormInput,
 } from './Searchbar.styled';
 
-export default function Searchbar() {
-  return (
-    <SearchbarSection>
-      <SearchForm>
-        <SearchFormButton type="submit">
-          <SearchFormButtonLabel>Search</SearchFormButtonLabel>
-        </SearchFormButton>
+export default class Searchbar extends Component {
+  state = { searchQuery: '', prevSearchQuery: '' };
 
-        <SearchFormInput
-          type="text"
-          autoComplete="off"
-          autoFocus
-          placeholder="Search images and photos"
-        />
-      </SearchForm>
-    </SearchbarSection>
-  );
+  handleInputChange = e => {
+    const { name, value } = e.currentTarget;
+    this.setState({ [name]: value.toLowerCase().trim() });
+  };
+
+  reset = () => {
+    this.setState({ searchQuery: '' });
+  };
+
+  handleFormSubmit = e => {
+    e.preventDefault();
+    const { searchQuery } = this.state;
+    if (!searchQuery) {
+      toast.info('Please write search query.');
+      return;
+    }
+
+    if (searchQuery === this.state.prevSearchQuery) {
+      toast.info(
+        `"${searchQuery}" search completed. Enter a different search query`
+      );
+      this.reset();
+      return;
+    }
+
+    this.setState({ prevSearchQuery: searchQuery });
+    console.log(searchQuery);
+    this.props.formSubmitHandler(searchQuery);
+    this.reset();
+  };
+
+  render() {
+    return (
+      <SearchbarSection>
+        <SearchForm onSubmit={this.handleFormSubmit}>
+          <SearchFormButton type="submit">
+            <SearchFormButtonLabel>Search</SearchFormButtonLabel>
+          </SearchFormButton>
+
+          <SearchFormInput
+            name="searchQuery"
+            type="text"
+            autoComplete="off"
+            autoFocus
+            placeholder="Search images and photos"
+            onChange={this.handleInputChange}
+            value={this.state.searchQuery}
+          />
+        </SearchForm>
+      </SearchbarSection>
+    );
+  }
 }
