@@ -17,7 +17,7 @@ export default class Modal extends Component {
     }
   };
 
-  onBackdropClick = ({ target, currentTarget }) => {
+  onOverlayClick = ({ target, currentTarget }) => {
     if (currentTarget === target) {
       this.props.onCloseModal();
     }
@@ -27,7 +27,7 @@ export default class Modal extends Component {
     const { largeImageURL, alt } = this.props;
 
     return (
-      <Overlay className="overlay" onClick={this.onBackdropClick}>
+      <Overlay className="overlay" onClick={this.onOverlayClick}>
         <ModalContent className="modal">
           <img src={largeImageURL} alt={alt} />
         </ModalContent>
