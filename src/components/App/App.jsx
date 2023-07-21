@@ -47,9 +47,10 @@ export default class App extends Component {
 
         if (!totalHits) {
           this.setState({ loading: false, error: true });
-          return toast.warn(
+          toast.warn(
             'Sorry, there are no images matching your search query. Please try again.'
           );
+          return;
         }
 
         if (nextPage === 1 || totalHits <= servicePixabayAPI.hitsPerPage) {
