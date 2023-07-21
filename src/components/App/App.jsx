@@ -26,17 +26,10 @@ export default class App extends Component {
   };
 
   componentDidUpdate(_, prevState) {
-    const prevQuery = prevState.searchQuery;
-    const nextQuery = this.state.searchQuery;
-    const prevPage = prevState.galleryPage;
-    const nextPage = this.state.galleryPage;
+    const { searchQuery: prevQuery, galleryPage: prevPage } = prevState;
+    const { searchQuery: nextQuery, galleryPage: nextPage } = this.state;
 
-    if (prevQuery !== nextQuery) {
-      this.setState({ galleryPage: 1, galleryItems: [], isButtonShow: false });
-      if (nextPage === 1) {
-        this.fetchGalleryItems(nextQuery, nextPage);
-      }
-    } else if (prevPage !== nextPage) {
+    if (prevQuery !== nextQuery || prevPage !== nextPage) {
       this.fetchGalleryItems(nextQuery, nextPage);
     }
   }
@@ -47,54 +40,66 @@ export default class App extends Component {
     servicePixabayAPI.query = nextQuery;
     servicePixabayAPI.page = nextPage;
 
-    servicePixabayAPI.getImages().then(data => {
-      servicePixabayAPI.hits = data.totalHits;
+    servicePixabayAPI
+      .getImages()
+      .then(data => {
+        const { totalHits, hits } = data;
 
-      const newData = data.hits.map(
-        ({ id, tags, webformatURL, largeImageURL }) => ({
-          id,
-          tags,
-          webformatURL,
-          largeImageURL,
-        })
-      );
-      const currentData = [...this.state.galleryItems, ...newData];
+        if (!totalHits) {
+          this.setState({ loading: false, error: true });
+          return toast.warn(
+            'Sorry, there are no images matching your search query. Please try again.'
+          );
+        }
 
-      this.setState(prevState => ({
-        galleryItems: [...prevState.galleryItems, ...newData],
-      }));
+        if (nextPage === 1 || totalHits <= servicePixabayAPI.hitsPerPage) {
+          toast.success(`Hooray! We found ${totalHits} images.`);
+        }
 
-      if (!data.totalHits) {
-        this.setState({ loading: false, error: true });
-        return toast.warn(
-          'Sorry, there are no images matching your search query. Please try again.'
+        const newData = hits.map(
+          ({ id, tags, webformatURL, largeImageURL }) => ({
+            id,
+            tags,
+            webformatURL,
+            largeImageURL,
+          })
         );
-      }
 
-      if (currentData.length >= data.totalHits) {
+        this.setState(prevState => ({
+          galleryItems: [...prevState.galleryItems, ...newData],
+        }));
+
+        const quantityGalleryItems =
+          this.state.galleryItems.length + servicePixabayAPI.hitsPerPage;
+
+        if (
+          quantityGalleryItems >= totalHits ||
+          totalHits <= servicePixabayAPI.hitsPerPage
+        ) {
+          this.setState({
+            isButtonShow: false,
+          });
+        } else {
+          this.setState({
+            isButtonShow: true,
+          });
+        }
+      })
+      .catch(error => console.error(error))
+      .finally(
         this.setState({
           loading: false,
-          isButtonShow: false,
           error: false,
-        });
-        return;
-      }
-
-      if (nextPage === 1) {
-        toast.success(`Hooray! We found ${servicePixabayAPI.hits} images.`);
-      }
-
-      this.setState({
-        loading: false,
-        isButtonShow: true,
-        error: false,
-      });
-    });
+        })
+      );
   };
 
   handlerSearchQuery = searchQuery => {
     this.setState({
       searchQuery: searchQuery,
+      galleryPage: 1,
+      galleryItems: [],
+      isButtonShow: false,
     });
   };
 
