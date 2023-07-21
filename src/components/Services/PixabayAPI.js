@@ -25,13 +25,9 @@ export default class servicePixabayAPI {
       },
     };
 
-    try {
-      const response = await axios.get('', config);
-      this.increasePage();
-      return response.data;
-    } catch (error) {
-      console.error(error);
-    }
+    const response = await axios.get('', config);
+    this.increasePage();
+    return response.data;
   }
 
   get query() {
