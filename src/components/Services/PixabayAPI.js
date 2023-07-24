@@ -1,9 +1,10 @@
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
 export default async function servicePixabayAPI(
   searchQuery,
   page,
-  hitsPerPage
+  hitsPerPage = 12
 ) {
   const API_KEY = '36923827-7e58aafe5e36d67095a3a9316';
 
@@ -24,3 +25,9 @@ export default async function servicePixabayAPI(
   const response = await axios.get('', config);
   return response.data;
 }
+
+servicePixabayAPI.propTypes = {
+  searchQuery: PropTypes.string.isRequired,
+  page: PropTypes.number.isRequired,
+  hitsPerPage: PropTypes.number,
+};
